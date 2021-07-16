@@ -2,7 +2,7 @@ import scrapy
 
 
 class TesteSpider(scrapy.Spider):
-    name = "teste"
+    name = "beers"
 
     def start_requests(self):
         # Coleta a url de cada estado
