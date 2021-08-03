@@ -5,7 +5,7 @@ class TesteSpider(scrapy.Spider):
     name = "reviews"
 
     def start_requests(self):
-        # Coleta a url de cada estado
+        # Coleta a url de cada cerveja brasileira
         urls = ["https://www.brejas.com.br/cerveja/brasil"]
         for url in urls:
             yield scrapy.Request(url=url, callback=self.parse_beers)
@@ -23,9 +23,14 @@ class TesteSpider(scrapy.Spider):
         def extract_rating(value):
             return value.split("\xa0")[0]
 
-        for child in response.xpath('//*[@id="jr-pagenav-ajax"]/div[2]/div'):
-            reviews = child.css("div.jrCol.jrRatingValue::text").get()
-            data = {
+        div_num = 5
+        if not response.xpath('//*[@id="userReviews"]/div[{}]/div/div'.format(div_num)):
+            div_num = 3
+
+        for child in response.xpath('//*[@id="userReviews"]/div[{}]/div/div'.format(div_num)):
+            reviews = child.css(".jrRatingValue::text").getall()
+            # self.logger.info(reviews)
+            yield {
                 "user_name": child.css(".jrUserInfoText span::text").get(),
                 "beer_name": response.css(".contentheading span a::text").get(),
                 "review_commentary": response.css("div.description.jrReviewComment div::text").get(),
@@ -36,4 +41,3 @@ class TesteSpider(scrapy.Spider):
                 "sensation": extract_rating(reviews[4]),
                 "ensemble": extract_rating(reviews[5])
             }
-            yield data
