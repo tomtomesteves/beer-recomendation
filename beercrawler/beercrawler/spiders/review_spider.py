@@ -12,8 +12,8 @@ class TesteSpider(scrapy.Spider):
 
     def parse_beers(self, response):
         yield from response.follow_all(css='.jrListingTitle a', callback=self.parse_reviews)
-        yield from response.follow_all(css="""#jr-pagenav-ajax > div.jr-pagenav.jrTableGrid.jrPagination.jrPaginationTop
-                                            > div.jrCol4.jrPagenavPages > a.jr-pagenav-next.jrButton.jrSmall""",
+        yield from response.follow_all(css="""#jr-pagenav-ajax > div.jr-pagenav.jrTableGrid.jrPagination.jrPaginationBottom >
+                                            div.jrCol4.jrPagenavPages > div > a.jr-pagenav-next.jrButton.jrSmall""",
                                        callback=self.parse_beers)
 
     def go_to_all_review(self, response):
@@ -32,8 +32,8 @@ class TesteSpider(scrapy.Spider):
             # self.logger.info(reviews)
             yield {
                 "user_name": child.css(".jrUserInfoText span::text").get(),
-                "beer_name": response.css(".contentheading span a::text").get(),
-                "review_commentary": response.css("div.description.jrReviewComment div::text").get(),
+                "beer_name": response.css(".contentheading span::text").get(),
+                "review_commentary": child.css("div.description.jrReviewComment div::text").get(),
                 "overall": extract_rating(reviews[0]),
                 "aroma": extract_rating(reviews[1]),
                 "appearance": extract_rating(reviews[2]),
